@@ -29,7 +29,7 @@ public class Spike extends StaticEntity {
     }
 
     public void update(){
-        cooldown -= GameTime.getDeltaFrame();
+        cooldown -= GameTime.getDeltaFrameSecond();
         if (cooldown <= 0){
             animation.nextFrame();
             if (animation.isAnimationEnd()){
@@ -55,7 +55,7 @@ public class Spike extends StaticEntity {
     public int attack(){
         if (cooldown <= 0 && !hasAttack){
             hasAttack = true;
-            return 20;
+            return 5;
         }
         if (cooldown > 0 ){
             hasAttack = false;

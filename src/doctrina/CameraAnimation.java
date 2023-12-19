@@ -39,14 +39,14 @@ public class CameraAnimation{
     }
 
     private void updateAnimation() {
-        int distanceX = ((int) ((( cameraDestinationX - camera.getPositionX() ) * GameTime.getDeltaFrame() ) / animationDuration) );
-        int distanceY = ((int) ((( cameraDestinationY - camera.getPositionY() ) * GameTime.getDeltaFrame() ) / animationDuration) );
+        int distanceX = ((int) ((( cameraDestinationX - camera.getPositionX() ) * GameTime.getDeltaFrameSecond() ) / animationDuration) );
+        int distanceY = ((int) ((( cameraDestinationY - camera.getPositionY() ) * GameTime.getDeltaFrameSecond() ) / animationDuration) );
         camera.setPosition(camera.getPositionX() + distanceX, camera.getPositionY() + distanceY);
-        animationDuration -= GameTime.getDeltaFrame();
+        animationDuration -= GameTime.getDeltaFrameSecond();
 
     }
 
     private void updateTimeStop(){
-        animationStop -= GameTime.getDeltaFrame();
+        animationStop -= GameTime.getDeltaFrameSecond();
     }
 }

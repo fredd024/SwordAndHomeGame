@@ -14,7 +14,8 @@ public enum SoundEffect {
     SKELETON_DEATH("audios/skeletonDeath.wav",0.6f),
     MAIN_MUSIC("audios/mainMusic.wav",0.5f),
     BASIC_ATTACK("audios/basicAttack.wav"),
-    ENEMY_HURT("audios/ennemieHurt2.wav",0.1f);
+    ENEMY_HURT("audios/ennemieHurt2.wav",0.1f),
+    MURLOC("audios/murloc.wav");
 
     private String path;
     private float volume = 1f;

@@ -3,12 +3,14 @@ package homeAndSwordGame;
 import doctrina.Canvas;
 import doctrina.*;
 import homeAndSwordGame.Wave.Wave;
+import homeAndSwordGame.Wave.WaveOne;
 import homeAndSwordGame.entities.Player;
 import homeAndSwordGame.entities.Skeleton;
 import homeAndSwordGame.scenes.OustideHouseScene;
 import homeAndSwordGame.scenes.Scene;
 
 import java.awt.*;
+import java.util.ArrayList;
 
 public class SHGame extends Game {
 
@@ -43,9 +45,6 @@ public class SHGame extends Game {
 
     @Override
     protected void update() {
-        if (wave != null && wave.isWaveEnd()){
-            wave = null;
-        }
 
         if (GameTime.getElapsedTime() < 500 && GameTime.getElapsedTime() != 0){
             GameConfig.disableDebug();
@@ -87,27 +86,6 @@ public class SHGame extends Game {
             wave.update();
         }
 
-    }
-
-    @Override
-    protected void draw(Canvas canvas) {
-        canvas.drawRectangle(0, 0, RenderingEngine.getInstance().getScreen().getWidth(), RenderingEngine.getInstance().getScreen().getHeigth(), Color.BLACK);
-        camera.update(canvas);
-
-        actualScene.draw(canvas);
-
-        if (GameConfig.isDebugEnabled()) {
-            canvas.drawString("poisition: x=" + player.getX() + " y=" + player.getY(), 10 + camera.getPositionX(), 20 + camera.getPositionY(), Color.WHITE);
-            canvas.drawString("fps :" + GameTime.getCurrentFps(), 10 + camera.getPositionX(), 40 + camera.getPositionY(), Color.WHITE);
-        }
-
-        player.drawHud(canvas,camera);
-
-        if (!player.isAlive()){
-            canvas.drawRectangle(camera.getPositionX(), camera.getPositionY(), RenderingEngine.getInstance().getScreen().getWidth(),RenderingEngine.getInstance().getScreen().getHeigth(), new Color(0,0,0,70));
-            canvas.drawFontString("Game Over",camera.getPositionX() + (RenderingEngine.getInstance().getScreen().getWidth() / 2) , camera.getPositionY() + (RenderingEngine.getInstance().getScreen().getWidth() / 2), Color.RED);
-        }
-
         if (gamePad.isFirePressed() && player.canAttack()){
             player.attack();
             if (wave != null){
@@ -118,6 +96,42 @@ public class SHGame extends Game {
                 }
             }
         }
+
+    }
+
+    @Override
+    protected void draw(Canvas canvas) {
+        canvas.drawRectangle(0, 0, RenderingEngine.getInstance().getScreen().getWidth(), RenderingEngine.getInstance().getScreen().getHeigth(), Color.BLACK);
+        camera.update(canvas);
+
+        actualScene.draw(canvas);
+
+        if (GameConfig.isDebugEnabled()) {
+            canvas.drawString("poisition: x=" + player.getX() + " y=" + player.getY(), 10 + camera.getPositionX() + 640, 20 + camera.getPositionY(), Color.WHITE);
+            canvas.drawString("fps :" + GameTime.getCurrentFps(), 10 + camera.getPositionX() + 740, 40 + camera.getPositionY(), Color.WHITE);
+        }
+
+        player.drawHud(canvas,camera);
+
+        if (isInWave()){
+            if (wave.runOutOfTime()){
+                player.takeDamage(9999999);
+            }
+            wave.drawTime(canvas,camera);
+        }
+
+        if (!player.isAlive()){
+            canvas.drawRectangle(camera.getPositionX(), camera.getPositionY(), 800,RenderingEngine.getInstance().getScreen().getHeigth(), new Color(0,0,0,80));
+            canvas.setFont("/fonts/vinquerg.ttf",32f);
+            Rectangle gameOverDimension = canvas.getStringDimension("Game Over");
+            canvas.drawString("Game Over",camera.getPositionX() + (800 / 2) - (int) (gameOverDimension.getWidth() + 10 ) , camera.getPositionY() + (600 / 2) - (int) (gameOverDimension.getHeight() / 2), Color.RED);
+            canvas.setFont("/fonts/vinquerg.ttf",16f);
+            Rectangle restartDimension = canvas.getStringDimension("Press [e] to restart");
+            canvas.drawString("Press [e] to restart",camera.getPositionX() + (800 / 2) - (int) (restartDimension.getWidth() /4) , camera.getPositionY() + (600 / 2) + (int) gameOverDimension.getHeight(), Color.WHITE);
+            Rectangle quitDimension = canvas.getStringDimension("Press [q] to quit");
+            canvas.drawString("Press [q] to quit",camera.getPositionX() + (800 / 2) - (int) (quitDimension.getWidth() /2) , camera.getPositionY() + (600 / 2) + (int) gameOverDimension.getHeight() +(int) restartDimension.getHeight() / 2, Color.WHITE);
+        }
+
     }
 
     public void changeScene(Scene newScene) {
@@ -140,6 +154,9 @@ public class SHGame extends Game {
     }
 
     public boolean isInWave() {
-        return wave == null;
+        if (wave == null){
+            return false;
+        }
+        return !wave.isWaveEnded();
     }
 }

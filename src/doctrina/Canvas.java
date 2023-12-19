@@ -7,7 +7,7 @@ import java.io.InputStream;
 public class Canvas {
 
     private final Graphics2D graphics;
-    private final Font font = getFont();
+    private Font font = Font.getFont(Font.SERIF);
 
     public Canvas(Graphics2D graphics) {
         this.graphics = graphics;
@@ -35,13 +35,9 @@ public class Canvas {
 
     public void drawString(String text, int x, int y, Paint paint){
         graphics.setPaint(paint);
-        graphics.drawString(text,x,y);
-    }
-
-    public void drawFontString(String text, int x, int y, Paint paint){
-        graphics.setPaint(paint);
         graphics.setFont(font);
         graphics.drawString(text,x,y);
+        resetFont();
     }
 
     public void drawImage(Image image , int x , int y) {
@@ -54,7 +50,7 @@ public class Canvas {
 
     public Rectangle getStringDimension(String text){
 
-        FontMetrics fm = graphics.getFontMetrics(this.font);
+        FontMetrics fm = graphics.getFontMetrics();
         Rectangle2D bounds = fm.getStringBounds(text, graphics);
         int length = (int)bounds.getWidth();
         int height = (int)bounds.getHeight();
@@ -62,16 +58,22 @@ public class Canvas {
         return new Rectangle(length,height);
     }
 
-    private Font getFont(){
+
+    public void setFont (String filePath,float size) {
         Font font = null;
-        try (InputStream stream = Canvas.class.getResourceAsStream("/fonts/vinquerg.ttf")) {
+        try (InputStream stream = Canvas.class.getResourceAsStream(filePath)) {
             font = Font.createFont(Font.TRUETYPE_FONT, stream);
 
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
-        font = font.deriveFont(10f);
+        font = font.deriveFont(size);
 
-        return font;
+        this.font = font;
+    }
+
+
+    public void  resetFont(){
+       this.font = Font.getFont(Font.SERIF);
     }
 }

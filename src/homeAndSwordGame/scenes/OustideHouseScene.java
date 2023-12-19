@@ -3,9 +3,12 @@ package homeAndSwordGame.scenes;
 import doctrina.Canvas;
 import doctrina.GameConfig;
 import doctrina.ImageDrawer;
+import doctrina.MovableEntity;
 import homeAndSwordGame.*;
 import homeAndSwordGame.entities.HUD.LevelHud;
 import homeAndSwordGame.entities.House;
+
+import java.awt.*;
 
 public class OustideHouseScene extends Scene {
 
@@ -13,6 +16,7 @@ public class OustideHouseScene extends Scene {
     private House house;
     private TriggerZone levelZone;
     private LevelHud levelHud;
+    private WorldContent worldContent;
 
     @Override
     public void initialize() {
@@ -20,9 +24,8 @@ public class OustideHouseScene extends Scene {
         world.load();
         house = new House(722,400);
         levelZone = new TriggerZone(896,0,64,48);
-        WorldHitbox.loadMapHitbox();
         camera.setBordes(world.getWidth(),world.getHeight());
-
+        worldContent = new WorldContent("map /OutsideWorld.txt",player);
         levelHud = new LevelHud(gamePad,camera);
 
         ImageDrawer.getInstance().addEntity(player);
@@ -33,6 +36,10 @@ public class OustideHouseScene extends Scene {
 
     @Override
     public void update() {
+        for (MovableEntity entity: entities) {
+            entity.update();
+        }
+
         if (levelHud.isActive()) {
             levelHud.update();
             return;
@@ -54,8 +61,8 @@ public class OustideHouseScene extends Scene {
         if (lol && house.inDoorActionZone(player) && !SHGame.getInstance().isInWave()){
             SoundEffect.DOOR_OPENING.play();
             SoundEffect.MAIN_MUSIC.stopLoop();
-            SHGame.getInstance().changeScene(new HouseScene());
             player.teleport(122,460);
+            SHGame.getInstance().changeScene(new HouseScene());
         }
 
         if (levelZone.isTriggeredBy(player) && !SHGame.getInstance().isInWave()){
@@ -76,8 +83,12 @@ public class OustideHouseScene extends Scene {
         }
 
         if (GameConfig.isDebugEnabled()){
-            WorldHitbox.draw(canvas);
+            worldContent.drawHitBox(canvas);
             levelZone.draw(canvas);
+        }
+
+        if (house.inDoorActionZone(player)){
+            canvas.drawString("(e) interact", player.getX() - 10, player.getY(), Color.white);
         }
 
     }

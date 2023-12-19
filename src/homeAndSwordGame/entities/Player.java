@@ -19,6 +19,7 @@ public class Player extends ControllableEntity implements LivingEntity {
     private Rectangle attackZone;
     private AnimationDirectional playerAnimation;
     private AnimationDirectional attackAnimation;
+    private Pet follower;
 
     public Player(MovementController controller) {
         super(controller);
@@ -40,7 +41,7 @@ public class Player extends ControllableEntity implements LivingEntity {
     public void update(){
 
 
-        setSpeed((int) (speed * GameTime.getDeltaFrame()));
+        setSpeed((int) (speed * GameTime.getDeltaFrameSecond()));
         super.update();
         if (!attackAction) {
             moveWithController();
@@ -120,5 +121,29 @@ public class Player extends ControllableEntity implements LivingEntity {
     @Override
     public void takeDamage(int damage) {
         healtPoint -= damage;
+    }
+
+    public void removeFollower() {
+        follower.unfollow();
+        follower = null;
+    }
+
+    public void setFollower(Pet newFollower){
+        if (follower != null && follower.isFollowing()){
+             follower.unfollow();
+        }
+        follower = newFollower;
+         follower.follow();
+    }
+
+    public Pet getFollower(){
+        return follower;
+    }
+
+    public void heal(int healt){
+        healtPoint += healt;
+        if (healtPoint > maxHealtPoint){
+            healtPoint = maxHealtPoint;
+        }
     }
 }

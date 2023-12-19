@@ -37,11 +37,12 @@ public class Button extends StaticEntity {
 
     @Override
     public void draw(Canvas canvas) {
+        canvas.setFont("/fonts/vinquerg.ttf",10f);
         if (textDimension == null) {
             textDimension = canvas.getStringDimension(text);
         }
         canvas.drawImage(getButtonImage(), this.getX() + levelHud.getX(), this.getY() + levelHud.getY());
-        canvas.drawFontString(text
+        canvas.drawString(text
                 , getCenterTextPositionX() + levelHud.getX()
                 , getCenterTextPositionY() + levelHud.getY()
                 , Color.BLACK);

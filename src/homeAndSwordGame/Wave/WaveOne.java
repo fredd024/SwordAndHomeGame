@@ -17,34 +17,12 @@ public class WaveOne extends Wave{
     @Override
     protected void generateEnnemies(Player player) {
         Skeleton skeleton;
-        skeleton = new Skeleton(player);
-        skeleton.teleport(10,500);
-        skeleton.changeTarget(null);
-        ennemies.add(skeleton);
+        for (int i = 0; i < 5; i++) {
+            skeleton = new Skeleton(player);
+            skeleton.teleport((int) (Math.random() * 72 + 10),(int) (Math.random() * 324 + 460));
+            skeleton.changeTarget(null);
+            ennemies.add(skeleton);
+        }
 
-        skeleton = new Skeleton(player);
-        skeleton.teleport(100,540);
-        skeleton.changeTarget(null);
-        ennemies.add(skeleton);
-
-        skeleton = new Skeleton(player);
-        skeleton.teleport(30,520);
-        skeleton.changeTarget(null);
-        ennemies.add(skeleton);
-
-        skeleton = new Skeleton(player);
-        skeleton.teleport(50,600);
-        skeleton.changeTarget(null);
-        ennemies.add(skeleton);
-
-        skeleton = new Skeleton(player);
-        skeleton.teleport(10,780);
-        skeleton.changeTarget(null);
-        ennemies.add(skeleton);
-
-        skeleton = new Skeleton(player);
-        skeleton.teleport(10,500);
-        skeleton.changeTarget(null);
-        ennemies.add(skeleton);
     }
 }

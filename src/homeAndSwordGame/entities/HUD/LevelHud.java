@@ -74,13 +74,14 @@ public class LevelHud extends StaticEntity {
     @Override
     public void draw(Canvas canvas) {
 
-        teleport(camera.getPositionX() + 300,camera.getPositionY() + 300);
+        teleport(camera.getPositionX() + 400 - (this.width / 2),camera.getPositionY() + 300 - (this.height / 2));
         canvas.drawImage(backgroundImage,x,y);
         for (Button btn: buttons) {
             btn.draw(canvas);
         }
         hand.draw(canvas);
 
+        canvas.resetFont();
         Rectangle StringOneDimension = canvas.getStringDimension("[echap] - quitter");
         Rectangle StringTwoDimension = canvas.getStringDimension("[Enter] - selectioner");
         canvas.drawString("q - quitter",this.x, this.y + this.height + (int) StringOneDimension.getHeight(),Color.WHITE);

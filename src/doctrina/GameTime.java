@@ -12,11 +12,11 @@ public class GameTime {
     private static long fpsTimeDelta;
     private static long gameStartTime;
     private long lastFrameTime;
-    private static float deltaFrame;
+    private static float deltaFrameSecond;
     private long syncTime;
 
-    public static float getDeltaFrame() {
-        return deltaFrame;
+    public static float getDeltaFrameSecond() {
+        return deltaFrameSecond;
     }
 
     public static long getCurrentTime() {
@@ -66,7 +66,7 @@ public class GameTime {
             fpsCount = 0;
         }
         fpsTimeDelta = currentSecond;
-        deltaFrame = (System.currentTimeMillis() - lastFrameTime) / 1000.0f;
+        deltaFrameSecond = (System.currentTimeMillis() - lastFrameTime) / 1000.0f;
         lastFrameTime = System.currentTimeMillis();
     }
 

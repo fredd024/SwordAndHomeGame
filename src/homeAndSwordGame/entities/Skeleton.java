@@ -43,7 +43,7 @@ public class Skeleton extends MovableEntity  implements LivingEntity {
             return;
         }
 
-        setSpeed((int) (speed * GameTime.getDeltaFrame()));
+        setSpeed((int) (speed * GameTime.getDeltaFrameSecond()));
         super.update();
 
         if (target == null){
@@ -68,7 +68,7 @@ public class Skeleton extends MovableEntity  implements LivingEntity {
             if (attackAnimation.isAnimationEnd()){
                 attackAction = false;
                 if (target.intersectwith(attackZone) && target instanceof LivingEntity){
-                    ((LivingEntity)target).takeDamage(10);
+                    ((LivingEntity)target).takeDamage(30);
                 }
             }
             attackAnimation.nextFrame();
@@ -143,7 +143,7 @@ public class Skeleton extends MovableEntity  implements LivingEntity {
             canvas.drawImage(attackAnimation.getImage(), attackPosition.x, attackPosition.y);
         }
 
-        if (GameConfig.isDebugEnabled()){
+        if (GameConfig.isDebugEnabled() && isAlive()){
             drawHitBox(canvas);
         }
     }

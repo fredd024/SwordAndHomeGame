@@ -2,15 +2,19 @@ package homeAndSwordGame.entities;
 
 import doctrina.Canvas;
 import doctrina.*;
+import homeAndSwordGame.SoundEffect;
 
 import java.awt.*;
 
-public class Dog extends MovableEntity {
+public class Dog extends MovableEntity implements Pet {
     private int speed = 175;
     private AnimationDirectional animation ;
     private Rectangle interactionZone;
     private Player player;
-    private StaticEntity target;
+    private boolean isFollowing;
+    private float healCooldown = 0;
+    private float actionCooldwn;
+    private Direction actionDirection;
 
     public Dog(Player player) {
         super();
@@ -22,33 +26,23 @@ public class Dog extends MovableEntity {
         animation = new AnimationDirectional("images/Animal/whiteDog.png",this,3);
         animation.idle(Direction.DOWN);
         this.player = player;
-        this.target = null;
     }
 
     public void update(){
-        setSpeed((int) (speed * GameTime.getDeltaFrame()));
+        setSpeed((int) (speed * GameTime.getDeltaFrameSecond()));
         interactionZone.setLocation((int) (x - interactionZone.getWidth()/2 + this.getWidth()/2 ), (int) (y - interactionZone.getHeight() /2 + this.getHeight()/2));
         super.update();
 
-        if (target == null){
-            return;
-        }
-        
-        if (target instanceof LivingEntity){
-            if (!((LivingEntity) target).isAlive()){
-                target = player;
-            }
-        }
 
-        int targetXdistance = Math.abs((x - target.getX()));
-        int targetYdistance = Math.abs((y - target.getY()));
+        int targetXdistance = Math.abs((x - player.getX()));
+        int targetYdistance = Math.abs((y - player.getY()));
 
-        if ((targetXdistance + targetYdistance) > 60 || !( target instanceof Player)) {
+        if ((targetXdistance + targetYdistance) > 200 && isFollowing ) {
             if (targetXdistance >= targetYdistance) {
-                if (x - target.getX() < 0) {
+                if (x - player.getX() < 0) {
                     moveRight();
                     if (!hasMoved()) {
-                        if (y - target.getY() < 0) {
+                        if (y - player.getY() < 0) {
                             moveDown();
                         } else {
                             moveUp();
@@ -57,7 +51,7 @@ public class Dog extends MovableEntity {
                 } else {
                     moveLeft();
                     if (!hasMoved()) {
-                        if (y - target.getY() < 0) {
+                        if (y - player.getY() < 0) {
                             moveDown();
                         } else {
                             moveUp();
@@ -65,10 +59,10 @@ public class Dog extends MovableEntity {
                     }
                 }
             } else {
-                if (y - target.getY() < 0) {
+                if (y - player.getY() < 0) {
                     moveDown();
                     if (!hasMoved()) {
-                        if (x - target.getX() < 0) {
+                        if (x - player.getX() < 0) {
                             moveRight();
                         } else {
                             moveLeft();
@@ -77,7 +71,7 @@ public class Dog extends MovableEntity {
                 } else {
                     moveUp();
                     if (!hasMoved()) {
-                        if (x - target.getX() < 0) {
+                        if (x - player.getX() < 0) {
                             moveRight();
                         } else {
                             moveLeft();
@@ -85,6 +79,14 @@ public class Dog extends MovableEntity {
                     }
                 }
             }
+        } else if (isFollowing) {
+            if (healCooldown > 0){
+                healCooldown -= GameTime.getDeltaFrameSecond();
+                randomMove();
+            }else {
+                heal();
+            }
+
         }
 
 
@@ -102,31 +104,67 @@ public class Dog extends MovableEntity {
             drawHitBox(canvas);
             canvas.drawRectangle(interactionZone,Color.blue);
         }
-        if (actionTriggerRange(player)){
-            canvas.drawString("(e) interact" , x - 20 , y , Color.WHITE);
-        }
-    }
-
-    public void setTarget(StaticEntity entity) {
-        target = entity;
-    }
-
-    public int distanceWith(StaticEntity entity){
-        int entityXdistance = Math.abs((x - entity.getX()));
-        int entityYdistance = Math.abs((y -entity.getY()));
-
-        return entityXdistance + entityYdistance;
     }
 
     public boolean actionTriggerRange(Player player) {
         return player.intersectwith(interactionZone);
     }
 
-    public void action(){
-        if (target == null){
-            target = player;
-        } else {
-            target = null;
-        }
+    @Override
+    public boolean isFollowing() {
+        return isFollowing;
     }
+
+    @Override
+    public void follow() {
+        SoundEffect.SQUICK_SQUICK.play();
+        healCooldown = 5f;
+        isFollowing = true;
+    }
+
+    @Override
+    public void unfollow() {
+        isFollowing = false;
+    }
+
+    private void heal(){
+        SoundEffect.MURLOC.play();
+        player.heal(20);
+        healCooldown =  (float) (Math.random() * 55) + 5;
+    }
+
+    private void randomMove(){
+        if (actionCooldwn < 0) {
+            actionCooldwn = 0.5f;
+            int rnd = (int) (Math.random() * 10);
+            System.out.println(rnd);
+
+            if (rnd >= 5){
+                actionDirection = null;
+            }
+            if (rnd == 6){
+                actionDirection = Direction.UP;
+            }
+            if (rnd == 7){
+                actionDirection = Direction.DOWN;
+            }
+            if (rnd == 8){
+                actionDirection = Direction.RIGHT;
+            }
+            if (rnd == 9){
+                actionDirection = Direction.LEFT;
+            }
+
+        }
+        if (actionDirection != null) {
+            move(actionDirection);
+            int targetXdistance = Math.abs((x - player.getX()));
+            int targetYdistance = Math.abs((y - player.getY()));
+            if ((targetXdistance + targetYdistance) > 200 ){
+                actionDirection = null;
+            }
+        }
+        actionCooldwn -= GameTime.getDeltaFrameSecond();
+    }
+
 }

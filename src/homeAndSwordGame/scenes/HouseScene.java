@@ -3,6 +3,7 @@ package homeAndSwordGame.scenes;
 import doctrina.Canvas;
 import doctrina.GameConfig;
 import doctrina.ImageDrawer;
+import doctrina.MovableEntity;
 import homeAndSwordGame.*;
 
 import java.awt.*;
@@ -12,6 +13,7 @@ public class HouseScene extends Scene {
     private Rectangle outsideDoorZone;
     private Rectangle basementDoorZone;
     private World world;
+    private WorldContent worldContent;
 
     @Override
     public void initialize() {
@@ -24,24 +26,27 @@ public class HouseScene extends Scene {
         world.load();
         camera.setBordes(world.getWidth(), world.getHeight());
 
-        WorldHitbox2.loadMapHitbox();
+        worldContent = new WorldContent("map /House.txt",player);
     }
 
     @Override
     public void update() {
+        for (MovableEntity entity: entities) {
+            entity.update();
+        }
         player.update();
         camera.setRelatedPosition(player);
 
         if (gamePad.isInteractJustPressed() ){
             if (player.intersectwith(outsideDoorZone)){
                 SoundEffect.DOOR_OPENING.play();
-                SHGame.getInstance().changeScene(new OustideHouseScene());
                 player.teleport(800,600);
+                SHGame.getInstance().changeScene(new OustideHouseScene());
             }
             if (player.intersectwith(basementDoorZone)){
                 SoundEffect.DOOR_OPENING.play();
-                SHGame.getInstance().changeScene(new HouseBasement());
                 player.teleport(300, 430);
+                SHGame.getInstance().changeScene(new HouseBasement());
             }
 
         }
@@ -59,9 +64,16 @@ public class HouseScene extends Scene {
         world.drawForeground(canvas);
 
         if (GameConfig.isDebugEnabled()){
-            WorldHitbox2.draw(canvas);
+            worldContent.drawHitBox(canvas);
             canvas.drawRectangle(outsideDoorZone,PersonalColor.getTransprentBlue());
             canvas.drawRectangle(basementDoorZone,PersonalColor.getTransprentBlue());
+        }
+
+        if (player.intersectwith(basementDoorZone)){
+            canvas.drawString("(e) interact", player.getX() - 10, player.getY(), Color.white);
+        }
+        if (player.intersectwith(outsideDoorZone)){
+            canvas.drawString("(e) interact", player.getX() - 10, player.getY(), Color.white);
         }
 
     }

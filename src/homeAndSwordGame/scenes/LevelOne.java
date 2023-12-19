@@ -4,11 +4,12 @@ package homeAndSwordGame.scenes;
 import doctrina.Canvas;
 import doctrina.GameConfig;
 import doctrina.ImageDrawer;
+import doctrina.MovableEntity;
 import homeAndSwordGame.PersonalColor;
 import homeAndSwordGame.SHGame;
 import homeAndSwordGame.Wave.WaveOne;
 import homeAndSwordGame.World;
-import homeAndSwordGame.WorldHitbox4;
+import homeAndSwordGame.WorldContent;
 import homeAndSwordGame.entities.Skeleton;
 
 import java.awt.*;
@@ -19,14 +20,18 @@ public class LevelOne extends Scene {
     private World world;
     private ArrayList<Skeleton> skeletons = new ArrayList<>();
     private Rectangle exitZone;
+    private WorldContent worldContent;
 
     @Override
     public void initialize() {
         world = new World("images/World/level1Background.png","images/World/level1Foreground.png");
         world.load();
-        WorldHitbox4.loadMapContent(player);
+        worldContent = new WorldContent("map /LevelOne.txt",player);
         player . teleport(1089,800);
         exitZone = new Rectangle(464,224,48,48);
+        if (player.getFollower() != null){
+            ((MovableEntity) player.getFollower()).teleport(player.getX(),player.getY());
+        }
 
         generateSkeleton();
 
@@ -35,6 +40,9 @@ public class LevelOne extends Scene {
 
     @Override
     public void update() {
+        for (MovableEntity entity: entities) {
+            entity.update();
+        }
         player.update();
         for (Skeleton skeleton: skeletons) {
             skeleton.update();
@@ -46,7 +54,7 @@ public class LevelOne extends Scene {
             SHGame.getInstance().startWave(new WaveOne(player));
         }
 
-        WorldHitbox4.update();
+        worldContent.update();
         camera.setRelatedPosition(player);
 
         if (gamePad.isFirePressed() && player.canAttack()){
@@ -68,13 +76,22 @@ public class LevelOne extends Scene {
     @Override
     public void draw(Canvas canvas) {
         world.drawBackground(canvas);
-        WorldHitbox4.draw(canvas);
+        worldContent.draw(canvas);
         ImageDrawer.getInstance().draw(canvas);
 
         world.drawForeground(canvas);
+
+        Rectangle stringDimension = canvas.getStringDimension("Ennemies restants :");
+        canvas.drawString("Ennemies restants :", camera.getPositionX() + (800 /2) - (stringDimension.width / 2 ),camera.getPositionY() + 20, Color.WHITE);
+        canvas.drawString( getEnnemiesLeft() +"",camera.getPositionX() + (800 /2) ,camera.getPositionY() + 40, Color.WHITE);
+
         if (GameConfig.isDebugEnabled()){
-            WorldHitbox4.drawHitBox(canvas);
+            worldContent.drawHitBox(canvas);
             canvas.drawRectangle(exitZone.x, exitZone.y, exitZone.width,exitZone.height, PersonalColor.getTransprentBlue());
+        }
+
+        if (player.intersectwith(exitZone)){
+            canvas.drawString("Need to kill all Ennemy", player.getX() - 20, player.getY(), Color.RED);
         }
     }
 
@@ -98,11 +115,17 @@ public class LevelOne extends Scene {
     }
 
     private boolean areAllSkeletonKilled(){
+        return getEnnemiesLeft() == 0;
+    }
+
+    private int getEnnemiesLeft() {
+        int ennemies = 0;
+
         for (Skeleton skeleton: skeletons) {
             if (skeleton.isAlive()){
-                return false;
+                ennemies++;
             }
         }
-        return  true;
+        return ennemies;
     }
 }
