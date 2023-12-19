@@ -20,7 +20,7 @@ public class OustideHouseScene extends Scene {
 
     @Override
     public void initialize() {
-        world = new World("images/World/V2.png");
+        world = new World("images/World/outsideBackground.png","images/World/outsideForeground.png");
         world.load();
         house = new House(722,400);
         levelZone = new TriggerZone(896,0,64,48);
@@ -81,6 +81,8 @@ public class OustideHouseScene extends Scene {
         if (levelHud.isActive()) {
             levelHud.draw(canvas);
         }
+
+        world.drawForeground(canvas);
 
         if (GameConfig.isDebugEnabled()){
             worldContent.drawHitBox(canvas);
