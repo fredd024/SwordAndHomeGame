@@ -1,5 +1,7 @@
 package homeAndSwordGame;
 
+import doctrina.GameConfig;
+
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
@@ -15,7 +17,9 @@ public enum SoundEffect {
     MAIN_MUSIC("audios/mainMusic.wav",0.5f),
     BASIC_ATTACK("audios/basicAttack.wav"),
     ENEMY_HURT("audios/ennemieHurt2.wav",0.1f),
-    MURLOC("audios/murloc.wav");
+    MURLOC("audios/murloc.wav"),
+    LAZER("audios/Lazer.wav"),
+    SORCERERDEATH("audios/SorcererDeath.wav");
 
     private String path;
     private float volume = 1f;

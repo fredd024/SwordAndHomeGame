@@ -4,6 +4,7 @@ public class GameConfig {
 
     private static boolean debug;
     private static boolean fullScreen;
+    private static boolean sound = true;
 
     public static boolean isDebugEnabled() {
         return debug;
@@ -27,4 +28,10 @@ public class GameConfig {
     public static void fullScreenEnable() {  fullScreen = true;}
 
     public static void fullScreenDisable() {  fullScreen = false;}
+
+    public static void toggleSoubd() {
+        sound = !sound;
+    }
+
+    public static boolean isSound(){ return sound;}
 }

@@ -8,23 +8,29 @@ import java.awt.*;
 import java.awt.image.ImageObserver;
 import java.io.IOException;
 
-public class Button extends StaticEntity {
+public abstract class Button extends StaticEntity {
 
     private boolean active = false;
     private String text;
     private Rectangle textDimension;
-    private final String ACTIVE_BUTTON_PATH = "images/HUD/activeButton.png";
-    private final String UNACTIVE_BUTTON_PATH = "images/HUD/unactiveButton.png";
-    private Image activeButtonImage;
-    private Image unactiveButtonImage;
-    private LevelHud levelHud;
+    private String ACTIVE_BUTTON_PATH;
+    private String UNACTIVE_BUTTON_PATH;
+    protected Image activeButtonImage;
+    protected Image unactiveButtonImage;
 
-    public Button(String text, int x, int y , LevelHud levelHud) {
+    protected void setImage(String activeButtonPath, String unactiveButtonPath){
+        this.ACTIVE_BUTTON_PATH = activeButtonPath;
+        this.UNACTIVE_BUTTON_PATH = unactiveButtonPath;
+    }
+
+    public Button(String text, int x, int y) {
         this.text = text;
+        teleport(x,y);
+    }
+
+    protected void initialize(){
         loadImage();
         detecDimension();
-        teleport(x,y);
-        this.levelHud = levelHud;
     }
 
     public void setActiveButton() {
@@ -41,10 +47,10 @@ public class Button extends StaticEntity {
         if (textDimension == null) {
             textDimension = canvas.getStringDimension(text);
         }
-        canvas.drawImage(getButtonImage(), this.getX() + levelHud.getX(), this.getY() + levelHud.getY());
+        canvas.drawImage(getButtonImage(), this.getX(), this.getY());
         canvas.drawString(text
-                , getCenterTextPositionX() + levelHud.getX()
-                , getCenterTextPositionY() + levelHud.getY()
+                , getCenterTextPositionX()
+                , getCenterTextPositionY()
                 , Color.BLACK);
 
     }

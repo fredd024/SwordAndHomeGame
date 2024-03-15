@@ -30,7 +30,6 @@ public abstract class Scene {
    }
 
    private void addPlayerFollower(){
-      System.out.println("oui");
       ((MovableEntity) player.getFollower()).teleport(player.getX(),player.getY());
       entities.add((MovableEntity) player.getFollower());
       ImageDrawer.getInstance().addEntity((MovableEntity) player.getFollower());

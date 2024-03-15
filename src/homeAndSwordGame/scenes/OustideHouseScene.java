@@ -15,7 +15,7 @@ public class OustideHouseScene extends Scene {
     private World world;
     private House house;
     private TriggerZone levelZone;
-    private LevelHud levelHud;
+    private LevelHud  levelHud;
     private WorldContent worldContent;
 
     @Override

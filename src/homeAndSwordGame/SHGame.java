@@ -3,19 +3,20 @@ package homeAndSwordGame;
 import doctrina.Canvas;
 import doctrina.*;
 import homeAndSwordGame.Wave.Wave;
-import homeAndSwordGame.Wave.WaveOne;
+import homeAndSwordGame.entities.Ennemy;
 import homeAndSwordGame.entities.Player;
 import homeAndSwordGame.entities.Skeleton;
 import homeAndSwordGame.scenes.OustideHouseScene;
 import homeAndSwordGame.scenes.Scene;
+import homeAndSwordGame.scenes.ScreenMenu;
 
 import java.awt.*;
-import java.util.ArrayList;
 
 public class SHGame extends Game {
 
     private static SHGame instance;
 
+    private ScreenMenu screenMenu;
     private GamePad gamePad;
     private Camera  camera;
     private Player player;
@@ -37,6 +38,8 @@ public class SHGame extends Game {
         changeScene(new OustideHouseScene());
         player.teleport(500,500);
         actualScene.initialize();
+        screenMenu = new ScreenMenu(gamePad);
+        screenMenu.activateScreen();
         GameConfig.enableDebug();
         if (GameConfig.isFullScreen()){
             RenderingEngine.getInstance().getScreen().fullscreen();
@@ -46,8 +49,9 @@ public class SHGame extends Game {
     @Override
     protected void update() {
 
-        if (GameTime.getElapsedTime() < 500 && GameTime.getElapsedTime() != 0){
-            GameConfig.disableDebug();
+        if (screenMenu.isActive()){
+            screenMenu.update();
+            return;
         }
 
         if (!player.isAlive()){
@@ -63,7 +67,7 @@ public class SHGame extends Game {
         actualScene.update();
 
         if(gamePad.isQuitJustPressed()){
-            instance.stop();
+            screenMenu.activateScreen();
         }
 
         if (gamePad.isFullScreenJustPressed()){
@@ -89,9 +93,9 @@ public class SHGame extends Game {
         if (gamePad.isFirePressed() && player.canAttack()){
             player.attack();
             if (wave != null){
-                for (Skeleton skeleton: wave.getEnnemies()) {
-                    if (skeleton.intersectwith(player.getAttackZone())) {
-                        skeleton.takeDamage(5);
+                for (Ennemy ennemy: wave.getEnnemies()) {
+                    if (ennemy.intersectwith(player.getAttackZone())) {
+                        ennemy.takeDamage(5);
                     }
                 }
             }
@@ -101,6 +105,11 @@ public class SHGame extends Game {
 
     @Override
     protected void draw(Canvas canvas) {
+        if (screenMenu.isActive()){
+            screenMenu.draw(canvas);
+            return;
+        }
+
         canvas.drawRectangle(0, 0, RenderingEngine.getInstance().getScreen().getWidth(), RenderingEngine.getInstance().getScreen().getHeigth(), Color.BLACK);
         camera.update(canvas);
 

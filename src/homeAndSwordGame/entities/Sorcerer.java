@@ -1,35 +1,38 @@
 package homeAndSwordGame.entities;
 
-import doctrina.Canvas;
 import doctrina.*;
+import doctrina.Canvas;
 import homeAndSwordGame.SoundEffect;
 
 import java.awt.*;
 
-public class Skeleton extends Ennemy {
+public class Sorcerer extends Ennemy {
 
-    private int speed = 150;
-    private int maxHealthPoint = 20;
+    private int speed = 100;
+    private int maxHealthPoint = 10;
     private int healtPoint;
     private AnimationDirectional animation ;
     private AnimationSimple deathAnimation;
     private StaticEntity target;
     private boolean attackAction = false;
     private Point attackPosition;
+    private Direction attackDirection;
     private Rectangle attackZone;
-    private AnimationSimple attackAnimation;
+    private AnimationDirectional attackAnimation;
     private Player player;
+    private float cooldown = 0;
+    private int animationBooster = 3;
 
-    public Skeleton(Player player) {
+    public Sorcerer(Player player) {
         super();
         setDiemsion(32,32);
         setSpeed(0);
         healtPoint = maxHealthPoint;
         attackPosition= new Point();
-        animation = new AnimationDirectional("images/Ennemies/Skeleton/main.png",this,3);
+        animation = new AnimationDirectional("images/Ennemies/sorcerer/main.png",this,3);
         animation.idle(Direction.DOWN);
-        deathAnimation = new AnimationSimple("images/Ennemies/Skeleton/death.png",this,4);
-        attackAnimation = new AnimationSimple("images/Attack32x32.png",32,32,8);
+        deathAnimation = new AnimationSimple("images/Ennemies/sorcerer/death.png",this,10);
+        attackAnimation = new AnimationDirectional("images/longAttack64x64Purple.png",64,64,6);
         this.target = player;
         this.player = player;
     }
@@ -65,18 +68,37 @@ public class Skeleton extends Ennemy {
         }
 
         if (attackAction){
-            if (attackAnimation.isAnimationEnd()){
+            if (attackAnimation.isAnimationEnd() && animationBooster <= 0) {
                 attackAction = false;
-                if (target.intersectwith(attackZone) && target instanceof LivingEntity){
-                    ((LivingEntity)target).takeDamage(30);
-                }
+                animationBooster = 3;
+            }else if (attackAnimation.isAnimationEnd()){
+                animationBooster--;
             }
-            attackAnimation.nextFrame();
+            if (cooldown <= 0  && target.intersectwith(attackZone) && target instanceof LivingEntity){
+                ((LivingEntity)target).takeDamage(1);
+                cooldown = 0.1f;
+            }
+
+            cooldown -= GameTime.getDeltaFrameSecond();
+            attackAnimation.nextFrame(attackDirection);
             return;
         }
 
         if (distanceY < 32 && distanceX < 32){
-            attack();
+            boolean vertical = Math.abs(distanceX) < Math.abs(distanceY);
+            if (vertical && target.getY() - this.getY() < 0){
+                attack(Direction.UP);
+            }
+            if (vertical && target.getY() - this.getY() > 0){
+                attack(Direction.DOWN);
+            }
+            boolean horizontal = Math.abs(distanceY) < Math.abs(distanceX);
+            if (horizontal && target.getX() - this.getX() > 0){
+                attack(Direction.LEFT);
+            }
+            if (horizontal && target.getX() - this.getX() < 0){
+                attack(Direction.RIGHT);
+            }
         }
 
         if ( distanceX >= distanceY || distanceX < 32){
@@ -141,6 +163,9 @@ public class Skeleton extends Ennemy {
 
         if (attackAction){
             canvas.drawImage(attackAnimation.getImage(), attackPosition.x, attackPosition.y);
+            if (GameConfig.isDebugEnabled()) {
+                canvas.drawRectangle(attackZone, Color.red);
+            }
         }
 
         if (GameConfig.isDebugEnabled() && isAlive()){
@@ -159,18 +184,36 @@ public class Skeleton extends Ennemy {
             healtPoint -= damage;
             SoundEffect.ENEMY_HURT.play();
             if (!isAlive()){
-                SoundEffect.SKELETON_DEATH.play();
+                SoundEffect.SORCERERDEATH.play();
             }
         }
     }
 
-    public void attack(){
-        SoundEffect.BASIC_ATTACK.play();
+    public void attack(Direction direction){
+        SoundEffect.LAZER.play();
+
+        attackDirection = direction;
 
         attackAnimation.resetAnimation();
 
-        attackPosition.setLocation(target.getX(),target.getY());
-        attackZone = new Rectangle(target.getX(),target.getY(),32,32);
+        int positionX = this.x + this.width/2 - 32;
+        int positionY = this.y + this.width/2 - 32;
+
+        if (direction == Direction.LEFT) {
+            attackZone = new Rectangle(positionX +32 , positionY +28, 64, 8);
+            attackPosition.setLocation(positionX +32,positionY);
+        } else  if (direction == Direction.RIGHT) {
+            attackDirection = Direction.UP;
+            attackZone = new Rectangle(positionX -32, positionY +28, 64, 8);
+            attackPosition.setLocation(positionX -32,positionY);
+        }else  if (direction == Direction.UP) {
+            attackDirection = Direction.RIGHT;
+            attackZone = new Rectangle(positionX + 28, positionY - 32, 8, 64);
+            attackPosition.setLocation(positionX ,positionY - 32);
+        }else  if (direction == Direction.DOWN) {
+            attackZone = new Rectangle(positionX + 28, positionY + 32, 8, 64);
+            attackPosition.setLocation(positionX,positionY + 32);
+        }
 
         attackAction = true;
     }

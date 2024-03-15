@@ -137,7 +137,6 @@ public class Dog extends MovableEntity implements Pet {
         if (actionCooldwn < 0) {
             actionCooldwn = 0.5f;
             int rnd = (int) (Math.random() * 10);
-            System.out.println(rnd);
 
             if (rnd >= 5){
                 actionDirection = null;

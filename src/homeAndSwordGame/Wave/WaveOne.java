@@ -1,5 +1,7 @@
 package homeAndSwordGame.Wave;
 
+import doctrina.MovableEntity;
+import homeAndSwordGame.entities.Ennemy;
 import homeAndSwordGame.entities.Player;
 import homeAndSwordGame.entities.Skeleton;
 
@@ -7,7 +9,7 @@ import java.util.ArrayList;
 
 public class WaveOne extends Wave{
 
-    private ArrayList<Skeleton> ennemies = new ArrayList<>();
+    private ArrayList<Ennemy> ennemies = new ArrayList<>();
 
     public WaveOne(Player player){
         generateEnnemies(player);

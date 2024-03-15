@@ -29,7 +29,7 @@ public class TriggerZone {
     }
 
     public void draw (Canvas canvas){
-        canvas.drawRectangle(zone,Color.YELLOW);
+        canvas.drawRectangle(zone,new Color(255,255,0,80));
     }
 
     private void intersectWith(MovableEntity entity){
